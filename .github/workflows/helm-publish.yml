@@ -1,24 +1,26 @@
 name: Publish Helm Chart to GHCR
 
 on:
-push:
-branches: [ "main" ]
+ push:
+  branches:
+   - main
 
 jobs:
-publish:
-runs-on: ubuntu-latest
+ publish:
+  runs-on: ubuntu-latest
 
-steps:
-  - uses: actions/checkout@v4
+  steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-  - uses: azure/setup-helm@v4
+  - name: Set up Helm
+    uses: azure/setup-helm@v4
 
   - name: Login to GHCR
     run: echo "${{ secrets.GHCR_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
-  - name: Package Helm
+  - name: Package Helm Chart
     run: helm package charts/pgadmin4
 
-  - name: Push to GHCR
+  - name: Push Helm Chart
     run: helm push pgadmin4-*.tgz oci://ghcr.io/${{ github.repository_owner }}/helm-charts
-
